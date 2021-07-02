@@ -1,6 +1,6 @@
 # vue-three-boilerplate
 
-This is most useful as a template to copy and paste into your own projects rather than an NPM module. Copy the contents of `src/ThreeCanvas.vue` into your project and use as indicated in `src/App.vue`.
+This is most useful as a template to copy and paste into your own projects rather than an NPM module. Copy the contents of [`src/ThreeCanvas.vue`](https://raw.githubusercontent.com/SaFrMo/vue-three-boilerplate/main/src/ThreeCanvas.vue) into your project and use as indicated in `src/App.vue`.
 
 ## Project setup
 ```
