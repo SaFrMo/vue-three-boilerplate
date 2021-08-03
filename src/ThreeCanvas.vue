@@ -77,6 +77,8 @@ export default {
             this.camera.aspect = this.containerWidth / this.containerHeight
             this.camera.updateProjectionMatrix()
             this.renderer.setSize(this.containerWidth, this.containerHeight)
+            // render on resize to avoid flickering
+            this.renderer.render(this.scene, this.camera)
         },
     },
 }
