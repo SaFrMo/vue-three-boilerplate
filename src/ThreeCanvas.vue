@@ -5,15 +5,19 @@
 </template>
 
 <script>
-import { PerspectiveCamera, Scene, WebGLRenderer } from 'three'
+import * as THREE from 'three'
 
 export default {
+    props: {
+        fov: { type: Number, default: 75 },
+        orthographic: { type: Boolean, default: false },
+    },
     data() {
         return {
             resizeObserver: null,
 
-            containerWidth: 0,
-            containerHeight: 0,
+            containerWidth: 1,
+            containerHeight: 1,
 
             // set on this component, but not reacted to:
             // * renderer
@@ -23,14 +27,34 @@ export default {
     },
     mounted() {
         // prep scene
-        this.scene = new Scene()
+        this.scene = new THREE.Scene()
 
         // prep camera
-        const fov = 75
-        this.camera = new PerspectiveCamera(fov, 0.5625, 0.1, 1000)
+        if (this.orthographic) {
+            const width =
+                this.fov / (this.containerHeight / this.containerWidth)
+            const height = this.fov
+            const halfWidth = width / 2
+            const halfHeight = height / 2
+            this.camera = new THREE.OrthographicCamera(
+                -halfWidth,
+                halfWidth,
+                -halfHeight,
+                halfHeight,
+                0.1,
+                1000
+            )
+        } else {
+            this.camera = new THREE.PerspectiveCamera(
+                this.fov,
+                0.5625,
+                0.1,
+                1000
+            )
+        }
 
         // prep base renderer
-        this.renderer = new WebGLRenderer({
+        this.renderer = new THREE.WebGLRenderer({
             canvas: this.$refs.canvas,
             antialias: true,
             alpha: true,
@@ -74,9 +98,24 @@ export default {
 
             this.containerWidth = container.offsetWidth
             this.containerHeight = container.offsetHeight
-            this.camera.aspect = this.containerWidth / this.containerHeight
+
+            if (this.orthographic) {
+                const width =
+                    this.fov / (this.containerHeight / this.containerWidth)
+                const height = this.fov
+                const halfWidth = width / 2
+                const halfHeight = height / 2
+                this.camera.left = -halfWidth
+                this.camera.right = halfWidth
+                this.camera.top = halfHeight
+                this.camera.bottom = -halfHeight
+            } else {
+                // update aspect ratio, projection matrix, and renderer size
+                this.camera.aspect = this.containerWidth / this.containerHeight
+            }
             this.camera.updateProjectionMatrix()
             this.renderer.setSize(this.containerWidth, this.containerHeight)
+
             // render on resize to avoid flickering
             this.renderer.render(this.scene, this.camera)
         },
@@ -87,7 +126,7 @@ export default {
 <style lang="scss">
 .three-canvas-wrapper,
 .three-canvas {
-    position: absolute;
+    position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
